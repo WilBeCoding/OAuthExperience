@@ -3,6 +3,7 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
 var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 var passport = require('passport');
@@ -25,7 +26,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
-  keys: process.env.COOKIE_KEY1, process.env.COOKIE_KEY2, process.env.COOKIE_KEY3
+  keys: [process.env.COOKIE_KEY1, process.env.COOKIE_KEY2, process.env.COOKIE_KEY3]
 }))
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
@@ -38,6 +39,7 @@ passport.use(new LinkedInStrategy({
 }, function(accessToken, refreshToken, profile, done) {
   process.nextTick(function () {
       done(null, {id: profile.id, displayName: profile.displayName})
+    })
     }));
 
 passport.serializeUser(function(user, done) {
