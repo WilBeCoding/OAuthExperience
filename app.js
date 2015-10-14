@@ -23,9 +23,12 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: process.env.COOKIE_KEY1, process.env.COOKIE_KEY2, process.env.COOKIE_KEY3
+}))
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
-app.use(passport.session());
 passport.use(new LinkedInStrategy({
   clientID: process.env.LINKEDIN_CLIENT_ID,
   clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
@@ -34,13 +37,9 @@ passport.use(new LinkedInStrategy({
   state: true
 }, function(accessToken, refreshToken, profile, done) {
   process.nextTick(function () {
-    // To keep the example simple, the user's LinkedIn profile is returned to
-    // represent the logged-in user. In a typical application, you would want
-    // to associate the LinkedIn account with a user record in your database,
-    // and return that user instead.
-    return done(null, profile);
-  });
-}));
+      done(null, {id: profile.id, displayName: profile.displayName})
+    }));
+
 passport.serializeUser(function(user, done) {
   done(null, user);
 });
