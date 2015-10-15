@@ -39,17 +39,22 @@ passport.use(new LinkedInStrategy({
   state: true
 }, function(accessToken, refreshToken, profile, done) {
   process.nextTick(function () {
-      done(null, {id: profile.id, displayName: profile.displayName})
+      done(null, {id: profile.id, displayName: profile.displayName, token: accessToken})
     })
     }));
 
 passport.serializeUser(function(user, done) {
+  console.log("serializeUser is running");
   done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
   done(null, user)
 });
+  app.use(function (req, res, next) {
+  res.locals.user = req.user
+  next()
+})
 
 app.use('/', routes);
 app.use('/users', users);
